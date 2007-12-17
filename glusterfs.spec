@@ -6,7 +6,6 @@ Release:	%{release}
 Version:	%{version}
 Summary:	GlusterFS network/cluster filesystem
 Name:		%{name}
-BuildRoot:	%{_tmppath}/%{name}-root
 License:	GPL
 Group:          Networking/Other
 Source:		http://ftp.zresearch.com/pub/gluster/glusterfs/1.2/%{name}-%{version}.tar.gz
