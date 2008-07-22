@@ -1,6 +1,6 @@
 %define name	glusterfs
 %define version 1.2.3
-%define release %mkrel 1
+%define release %mkrel 3
 
 Release:	%{release}
 Version:	%{version}
