@@ -1,17 +1,22 @@
-%define name	glusterfs
-%define version 1.2.3
-%define release %mkrel 3
+%define	major 0
+%define libname	%mklibname glusterfs %{major}
+%define develname %mklibname -d glusterfs
 
-Release:	%{release}
-Version:	%{version}
 Summary:	GlusterFS network/cluster filesystem
-Name:		%{name}
-BuildRoot:	%{_tmppath}/%{name}-root
+Name:		glusterfs
+Version:	1.3.12
+Release:	%mkrel 1
 License:	GPL
-Group:          Networking/Other
-Source:		http://ftp.zresearch.com/pub/gluster/glusterfs/1.2/%{name}-%{version}.tar.gz
-BuildRequires:	%{mklibname fuse -d} >= 2.6.0, flex, bison
+Group:		Networking/Other
 URL:		http://www.gluster.org/glusterfs.php
+Source0:	http://ftp.zresearch.com/pub/gluster/glusterfs/1.3/%{name}-%{version}.tar.gz
+BuildRequires:	autoconf
+BuildRequires:	bison
+BuildRequires:	flex
+BuildRequires:	fuse-devel >= 2.6.0
+BuildRequires:	libibverbs-devel
+BuildRequires:	libtool
+BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-buildroot
 
 %description
 GlusterFS is a powerful network/cluster filesystem. The storage server
@@ -21,13 +26,38 @@ keep scaling your storage beyond peta bytes as your demand increases.
 
 Please visit http://www.gluster.org/glusterfs.php for more info.
 
-%package common
+%package -n	%{libname}
+Summary:	GlusterFS network/cluster filesystem library
+Group:          System/Libraries
+
+%description -n	%{libname}
+GlusterFS is a powerful network/cluster filesystem. The storage server
+(or each in a cluster) runs glusterfsd and the clients use mount
+command or glusterfs client to mount the exported filesystem. You can
+keep scaling your storage beyond peta bytes as your demand increases.
+
+This package contains the shared GlusterFS library.
+
+%package -n	%{develname}
+Summary:	Static library and header files for the GlusterFS library
+Group:		Development/C
+Provides:	%{name}-devel = %{version}
+Requires:	%{libname} = %{version}
+
+%description -n	%{develname}
+GlusterFS is a powerful network/cluster filesystem. The storage server
+(or each in a cluster) runs glusterfsd and the clients use mount
+command or glusterfs client to mount the exported filesystem. You can
+keep scaling your storage beyond peta bytes as your demand increases.
+
+This package contains the static GlusterFS library and its header files.
+
+%package	common
 Summary:	The common files needed by GlusterFS for client and server
-Group:          Networking/Other
+Group:		Networking/Other
 Requires:	fuse >= 2.6.0
 
-
-%description common
+%description	common
 GlusterFS is a powerful network/cluster filesystem. The storage server
 (or each in a cluster) runs glusterfsd and the clients use mount
 command or glusterfs client to mount the exported filesystem. You can
@@ -38,12 +68,12 @@ Please visit http://www.gluster.org/glusterfs.php for more info.
 The glusterfs-common package contains files needed by both glusterfs
 client and server.
 
-%package client
+%package	client
 Summary:	GlusterFS client
-Group:          Networking/Other
+Group:		Networking/Other
 Requires:	%{name}-common = %{version}
 
-%description client
+%description	client
 GlusterFS is a powerful network/cluster filesystem. The storage server
 (or each in a cluster) runs glusterfsd and the clients use mount
 command or glusterfs client to mount the exported filesystem. You can
@@ -53,12 +83,12 @@ Please visit http://www.gluster.org/glusterfs.php for more info.
 
 This package is the client needed to mount a GlusterFS fs.
 
-%package server
+%package	server
 Summary:	GlusterFS server
-Group:          Networking/Other
+Group:		Networking/Other
 Requires:	%{name}-common = %{version}
 
-%description server
+%description	server
 GlusterFS is a powerful network/cluster filesystem. The storage server
 (or each in a cluster) runs glusterfsd and the clients use mount
 command or glusterfs client to mount the exported filesystem. You can
@@ -69,25 +99,50 @@ Please visit http://www.gluster.org/glusterfs.php for more info.
 This package is the server.
 
 %prep
+
 %setup -q
 
 %build
-CFLAGS='-O3' %configure
-make
+%configure2_5x
+%make
 
 %install
-%{__rm} -Rf %{buildroot}
-%makeinstall slashsbindir=${RPM_BUILD_ROOT}/sbin
+rm -rf %{buildroot}
+
+%makeinstall slashsbindir=%{buildroot}/sbin
+
+# fix docs
+rm -rf installed_docs
+mv %{buildroot}%{_docdir}/glusterfs installed_docs
+
+%if %mdkversion < 200900
+%post -n %{libname} -p /sbin/ldconfig
+%endif
+
+%if %mdkversion < 200900
+%postun -n %{libname} -p /sbin/ldconfig
+%endif
 
 %clean
-%{__rm} -Rf %{buildroot}
+rm -rf %{buildroot}
+
+%files -n %{libname}
+%defattr(-,root,root)
+%doc README AUTHORS NEWS
+%{_libdir}/*.so.%{major}*
+
+%files -n %{develname}
+%defattr(-,root,root)
+%{_libdir}/*.so
+%{_libdir}/*.*a
 
 %files common
 %defattr(-,root,root)
-%{_sysconfdir}
+%doc installed_docs/*
+%{_sysconfdir}/glusterfs/glusterfs-client.vol.sample
+%{_sysconfdir}/glusterfs/glusterfs-server.vol.sample
 %{_libdir}/glusterfs
-%{_libdir}/libglusterfs.so
-%doc README AUTHORS NEWS COPYING
+%{_mandir}/man8/glusterfs.8*
 
 %files client
 %defattr(-,root,root)
@@ -97,4 +152,4 @@ make
 %files server
 %defattr(-,root,root)
 %{_sbindir}/glusterfsd
-%{_var}
+%dir /var/log/glusterfs
