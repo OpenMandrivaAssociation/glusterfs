@@ -5,7 +5,7 @@
 Summary:	GlusterFS network/cluster filesystem
 Name:		glusterfs
 Version:	1.3.12
-Release:	%mkrel 2
+Release:	%mkrel 3
 License:	GPL
 Group:		Networking/Other
 URL:		http://www.gluster.org/glusterfs.php
@@ -13,6 +13,7 @@ Source0:	http://ftp.zresearch.com/pub/gluster/glusterfs/1.3/%{name}-%{version}.t
 Source1:	glusterfsd.init
 Source2:	glusterfsd.sysconfig
 Source3:	glusterfsd.logrotate
+Source4:	glusterfs.logrotate
 BuildRequires:	autoconf
 BuildRequires:	bison
 BuildRequires:	flex
@@ -90,6 +91,7 @@ This package is the client needed to mount a GlusterFS fs.
 Summary:	GlusterFS server
 Group:		Networking/Other
 Requires:	%{name}-common = %{version}
+Requires:	%{name}-client = %{version}
 Requires(post): rpm-helper
 Requires(preun): rpm-helper
 
@@ -110,6 +112,7 @@ This package is the server.
 cp %{SOURCE1} glusterfsd.init
 cp %{SOURCE2} glusterfsd.sysconfig
 cp %{SOURCE3} glusterfsd.logrotate
+cp %{SOURCE4} glusterfs.logrotate
 
 %build
 %configure2_5x
@@ -128,7 +131,9 @@ install -d %{buildroot}/var/run/glusterfsd
 install -m0755 glusterfsd.init %{buildroot}%{_initrddir}/glusterfsd
 install -m0644 glusterfsd.sysconfig %{buildroot}%{_sysconfdir}/sysconfig/glusterfsd
 install -m0644 glusterfsd.logrotate %{buildroot}%{_sysconfdir}/logrotate.d/glusterfsd
+install -m0644 glusterfs.logrotate %{buildroot}%{_sysconfdir}/logrotate.d/glusterfs
 
+touch %{buildroot}/var/log/glusterfs/glusterfs.log
 touch %{buildroot}/var/log/glusterfs/glusterfsd.log
 
 # fix docs
@@ -142,6 +147,9 @@ mv %{buildroot}%{_docdir}/glusterfs installed_docs
 %if %mdkversion < 200900
 %postun -n %{libname} -p /sbin/ldconfig
 %endif
+
+%post client
+%create_ghostfile /var/log/glusterfs/glusterfs.log root root 0644
 
 %post server
 %create_ghostfile /var/log/glusterfs/glusterfsd.log root root 0644
@@ -174,8 +182,10 @@ rm -rf %{buildroot}
 
 %files client
 %defattr(-,root,root)
+%config(noreplace) %attr(0644,root,root) %{_sysconfdir}/logrotate.d/glusterfs
 /sbin/mount.glusterfs
 %{_sbindir}/glusterfs
+%attr(0644,root,root) %ghost %config(noreplace) /var/log/glusterfs/glusterfs.log
 
 %files server
 %defattr(-,root,root)
