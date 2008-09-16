@@ -76,6 +76,7 @@ client and server.
 Summary:	GlusterFS client
 Group:		Networking/Other
 Requires:	%{name}-common = %{version}
+Requires(post): rpm-helper
 
 %description	client
 GlusterFS is a powerful network/cluster filesystem. The storage server
