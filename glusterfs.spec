@@ -5,11 +5,14 @@
 Summary:	GlusterFS network/cluster filesystem
 Name:		glusterfs
 Version:	1.3.12
-Release:	%mkrel 1
+Release:	%mkrel 2
 License:	GPL
 Group:		Networking/Other
 URL:		http://www.gluster.org/glusterfs.php
 Source0:	http://ftp.zresearch.com/pub/gluster/glusterfs/1.3/%{name}-%{version}.tar.gz
+Source1:	glusterfsd.init
+Source2:	glusterfsd.sysconfig
+Source3:	glusterfsd.logrotate
 BuildRequires:	autoconf
 BuildRequires:	bison
 BuildRequires:	flex
@@ -87,6 +90,8 @@ This package is the client needed to mount a GlusterFS fs.
 Summary:	GlusterFS server
 Group:		Networking/Other
 Requires:	%{name}-common = %{version}
+Requires(post): rpm-helper
+Requires(preun): rpm-helper
 
 %description	server
 GlusterFS is a powerful network/cluster filesystem. The storage server
@@ -102,6 +107,10 @@ This package is the server.
 
 %setup -q
 
+cp %{SOURCE1} glusterfsd.init
+cp %{SOURCE2} glusterfsd.sysconfig
+cp %{SOURCE3} glusterfsd.logrotate
+
 %build
 %configure2_5x
 %make
@@ -110,6 +119,17 @@ This package is the server.
 rm -rf %{buildroot}
 
 %makeinstall slashsbindir=%{buildroot}/sbin
+
+install -d %{buildroot}%{_initrddir}
+install -d %{buildroot}%{_sysconfdir}/sysconfig
+install -d %{buildroot}%{_sysconfdir}/logrotate.d
+install -d %{buildroot}/var/run/glusterfsd
+
+install -m0755 glusterfsd.init %{buildroot}%{_initrddir}/glusterfsd
+install -m0644 glusterfsd.sysconfig %{buildroot}%{_sysconfdir}/sysconfig/glusterfsd
+install -m0644 glusterfsd.logrotate %{buildroot}%{_sysconfdir}/logrotate.d/%{name}
+
+touch %{buildroot}/var/log/glusterfs/glusterfsd.log
 
 # fix docs
 rm -rf installed_docs
@@ -122,6 +142,13 @@ mv %{buildroot}%{_docdir}/glusterfs installed_docs
 %if %mdkversion < 200900
 %postun -n %{libname} -p /sbin/ldconfig
 %endif
+
+%post server
+%create_ghostfile /var/log/glusterfs/glusterfsd.log root root 0644
+%_post_service glusterfsd
+
+%preun server
+%_preun_service glusterfsd
 
 %clean
 rm -rf %{buildroot}
@@ -143,6 +170,7 @@ rm -rf %{buildroot}
 %{_sysconfdir}/glusterfs/glusterfs-server.vol.sample
 %{_libdir}/glusterfs
 %{_mandir}/man8/glusterfs.8*
+%dir /var/log/glusterfs
 
 %files client
 %defattr(-,root,root)
@@ -151,5 +179,9 @@ rm -rf %{buildroot}
 
 %files server
 %defattr(-,root,root)
+%attr(0755,root,root) %{_initrddir}/glusterfsd
+%config(noreplace) %attr(0644,root,root) %{_sysconfdir}/sysconfig/glusterfsd
+%config(noreplace) %attr(0644,root,root) %{_sysconfdir}/logrotate.d/glusterfsd
 %{_sbindir}/glusterfsd
-%dir /var/log/glusterfs
+%attr(0644,root,root) %ghost %config(noreplace) /var/log/glusterfs/glusterfsd.log
+%dir /var/run/glusterfsd
