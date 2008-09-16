@@ -127,7 +127,7 @@ install -d %{buildroot}/var/run/glusterfsd
 
 install -m0755 glusterfsd.init %{buildroot}%{_initrddir}/glusterfsd
 install -m0644 glusterfsd.sysconfig %{buildroot}%{_sysconfdir}/sysconfig/glusterfsd
-install -m0644 glusterfsd.logrotate %{buildroot}%{_sysconfdir}/logrotate.d/%{name}
+install -m0644 glusterfsd.logrotate %{buildroot}%{_sysconfdir}/logrotate.d/glusterfsd
 
 touch %{buildroot}/var/log/glusterfs/glusterfsd.log
 
