@@ -5,7 +5,7 @@
 Summary:	GlusterFS network/cluster filesystem
 Name:		glusterfs
 Version:	1.3.12
-Release:	%mkrel 3
+Release:	%mkrel 4
 License:	GPL
 Group:		Networking/Other
 URL:		http://www.gluster.org/glusterfs.php
