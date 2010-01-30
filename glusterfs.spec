@@ -20,7 +20,6 @@ BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-buildroot
 BuildRequires:	autoconf
 BuildRequires:	bison
 BuildRequires:	flex
-BuildRequires:	db4-devel
 BuildRequires:	gcc
 BuildRequires:	make
 BuildRequires:	fuse-devel >= 2.6.0
