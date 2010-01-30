@@ -4,17 +4,18 @@
 
 Summary:	GlusterFS network/cluster filesystem
 Name:		glusterfs
-Version:	2.0.6
+Version:	3.0.0
 Release:	%mkrel 1
 License:	GPLv3+
 Group:		Networking/Other
 URL: 		http://www.gluster.org/docs/index.php/GlusterFS
-Source0:	ftp://ftp.gluster.com/pub/gluster/glusterfs/2.0/%{version}/%{name}-%{version}.tar.gz
+Source0:	ftp://ftp.gluster.com/pub/gluster/glusterfs/3.0/%{version}/%{name}-%{version}.tar.gz
 Source1:	glusterfsd.init
 Source2:	glusterfsd.sysconfig
 Source3:	glusterfsd.logrotate
 Source4:	glusterfs.logrotate
 Patch0:	glusterfs-sprint.patch
+Patch1:		glusterfs-3.0.0-link.patch
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-buildroot
 BuildRequires:	autoconf
 BuildRequires:	bison
@@ -133,9 +134,9 @@ is in userspace and easily manageable.
 This package is the server.
 
 %prep
-
 %setup -q %{name}-%{version}
-%patch0 -p1
+%patch1 -p0 -b .link
+#patch0 -p1
 cp %{SOURCE1} glusterfsd.init
 cp %{SOURCE2} glusterfsd.sysconfig
 cp %{SOURCE3} glusterfsd.logrotate
@@ -215,6 +216,7 @@ rm -rf %{buildroot}
 %defattr(-,root,root,-)
 %{_includedir}/glusterfs
 %{_includedir}/libglusterfsclient.h
+%{_datadir}/glusterfs/*.py
 %exclude %{_includedir}/glusterfs/y.tab.h
 %{_libdir}/*.a
 %exclude %{_libdir}/*.la
@@ -227,6 +229,7 @@ rm -rf %{buildroot}
 %docdir %{_docdir}/glusterfs
 %doc %{_docdir}/glusterfs/*
 %{_sysconfdir}/glusterfs/glusterfs*
+%{_bindir}/glusterfs-volgen
 %{_mandir}/man8/glusterfs.8*
 %dir /var/log/glusterfs
 %{_sbindir}/glusterfs
@@ -236,6 +239,7 @@ rm -rf %{buildroot}
 %defattr(-,root,root)
 %config(noreplace) %attr(0644,root,root) %{_sysconfdir}/logrotate.d/glusterfs
 /sbin/mount.glusterfs
+%{_mandir}/man8/mount.glusterfs.8.*
 %attr(0644,root,root) %ghost %config(noreplace) /var/log/glusterfs/glusterfs.log
 
 %files server
