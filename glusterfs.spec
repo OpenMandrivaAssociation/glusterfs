@@ -216,9 +216,8 @@ rm -rf %{buildroot}
 %{_includedir}/glusterfs
 %{_includedir}/libglusterfsclient.h
 %{_datadir}/glusterfs/*.py
-%exclude %{_includedir}/glusterfs/y.tab.h
 %{_libdir}/*.a
-%exclude %{_libdir}/*.la
+%{_libdir}/*.la
 %{_libdir}/*.so
 
 %files common
