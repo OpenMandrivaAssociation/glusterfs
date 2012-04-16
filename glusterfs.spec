@@ -149,7 +149,7 @@ make
     %{buildroot}%{_includedir}/glusterfs/
 
 # Remove unwanted files from all the shared libraries
-find %{buildroot}%{_libdir}/glusterfs -name '*.la' | xargs rm -f
+find %{buildroot}%{_libdir} -name '*.la' | xargs rm -f
 
 install -d %{buildroot}%{_initrddir}
 install -d %{buildroot}%{_sysconfdir}/sysconfig
