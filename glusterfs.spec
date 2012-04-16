@@ -4,24 +4,18 @@
 
 Summary:	GlusterFS network/cluster filesystem
 Name:		glusterfs
-Version:	3.0.0
-Release:	%mkrel 2
+Version:	3.2.6
+Release:	1
 License:	GPLv3+
 Group:		Networking/Other
-URL: 		http://www.gluster.org/docs/index.php/GlusterFS
+URL:		http://www.gluster.org/docs/index.php/GlusterFS
 Source0:	ftp://ftp.gluster.com/pub/gluster/glusterfs/3.0/%{version}/%{name}-%{version}.tar.gz
 Source1:	glusterfsd.init
 Source2:	glusterfsd.sysconfig
 Source3:	glusterfsd.logrotate
 Source4:	glusterfs.logrotate
-Patch0:	glusterfs-sprint.patch
-Patch1:		glusterfs-3.0.0-link.patch
-BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-buildroot
-BuildRequires:	autoconf
 BuildRequires:	bison
 BuildRequires:	flex
-BuildRequires:	gcc
-BuildRequires:	make
 BuildRequires:	fuse-devel >= 2.6.0
 BuildRequires:	libibverbs-devel
 BuildRequires:	libtool
@@ -40,7 +34,8 @@ Please visit http://www.gluster.org/docs/index.php/GlusterFS for more info.
 %package -n	%{libname}
 Summary:	GlusterFS network/cluster filesystem library
 Group:		System/Libraries
-Provides: 	glusterfs-libs, libglusterfs
+Provides: 	glusterfs-libs = %{EVRD}
+Provides:	libglusterfs = %{EVRD}
 
 %description -n	%{libname}
 GlusterFS is a clustered file-system capable of scaling to several
@@ -59,7 +54,7 @@ to both GlusterFS server and client framework.
 %package -n	%{develname}
 Summary:	Static library and header files for the GlusterFS library
 Group:		Development/C
-Provides:	%{name}-devel = %{version}
+Provides:	%{name}-devel = %{EVRD}
 Requires:	%{libname} = %{version}
 
 %description -n	%{develname}
@@ -79,7 +74,6 @@ This package contains the static GlusterFS library and its header files.
 Summary:	The common files needed by GlusterFS for client and server
 Group:		Networking/Other
 Requires:	fuse >= 2.6.0
-Requires:	libglusterfs
 
 %description	common
 GlusterFS is a clustered file-system capable of scaling to several
@@ -134,15 +128,13 @@ This package is the server.
 
 %prep
 %setup -q %{name}-%{version}
-%patch1 -p0 -b .link
-#patch0 -p1
 cp %{SOURCE1} glusterfsd.init
 cp %{SOURCE2} glusterfsd.sysconfig
 cp %{SOURCE3} glusterfsd.logrotate
 cp %{SOURCE4} glusterfs.logrotate
 
 %build
-%configure2_5x
+%configure2_5x --disable-static --enable-shared
 # Remove rpath
 sed -i 's|^hardcode_libdir_flag_spec=.*|hardcode_libdir_flag_spec=""|g' libtool
 sed -i 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' libtool
@@ -164,35 +156,27 @@ install -d %{buildroot}%{_sysconfdir}/sysconfig
 install -d %{buildroot}%{_sysconfdir}/logrotate.d
 install -d %{buildroot}/var/run/glusterfsd
 
-install -m0755 glusterfsd.init %{buildroot}%{_initrddir}/glusterfsd
+install -m0755 glusterfsd.init %{buildroot}%{_initrddir}/glusterd
 install -m0644 glusterfsd.sysconfig %{buildroot}%{_sysconfdir}/sysconfig/glusterfsd
-install -m0644 glusterfsd.logrotate %{buildroot}%{_sysconfdir}/logrotate.d/glusterfsd
-install -m0644 glusterfs.logrotate %{buildroot}%{_sysconfdir}/logrotate.d/glusterfs
+install -m0644 glusterfsd.logrotate %{buildroot}%{_sysconfdir}/logrotate.d/glusterfs-server
+install -m0644 glusterfs.logrotate %{buildroot}%{_sysconfdir}/logrotate.d/glusterfs-client
 
 touch %{buildroot}/var/log/glusterfs/glusterfs.log
 touch %{buildroot}/var/log/glusterfs/glusterfsd.log
 
 # remove default startup script
-%{__rm} %{buildroot}/etc/init.d/glusterfsd
+%{__rm} %{buildroot}/etc/init.d/glusterd
 
 # fix docs
 #rm -rf installed_docs
 #mv %{buildroot}%{_docdir}/glusterfs installed_docs
-
-%if %mdkversion < 200900
-%post -n %{libname} -p /sbin/ldconfig
-%endif
-
-%if %mdkversion < 200900
-%postun -n %{libname} -p /sbin/ldconfig
-%endif
 
 %post client
 %create_ghostfile /var/log/glusterfs/glusterfs.log root root 0644
 
 %post server
 %create_ghostfile /var/log/glusterfs/glusterfsd.log root root 0644
-%_post_service glusterfsd
+%_post_service glusterd
 if [ -e /etc/glusterfs/glusterfs-server.vol ]; then 
 echo "Updating /etc/sysconfig/glusterfsd to point to old /etc/glusterfs/glusterfs-server.vol file"
 sed -i 's|GLUSTERFSD_CONFIG_FILE="/etc/glusterfs/glusterfsd.vol"|GLUSTERFSD_CONFIG_FILE="/etc/glusterfs/glusterfs-server.vol"|g' /etc/sysconfig/glusterfsd
@@ -202,22 +186,18 @@ fi
 %preun server
 %_preun_service glusterfsd
 
-%clean
-rm -rf %{buildroot}
-
 %files -n %{libname}
 %defattr(-,root,root)
-# %doc README AUTHORS NEWS
 %{_libdir}/*.so.%{major}*
 %{_libdir}/glusterfs
 
 %files -n %{develname}
 %defattr(-,root,root,-)
 %{_includedir}/glusterfs
-%{_includedir}/libglusterfsclient.h
-%{_datadir}/glusterfs/*.py
-%{_libdir}/*.a
-%{_libdir}/*.la
+#%{_includedir}/libglusterfsclient.h
+#%{_datadir}/glusterfs/*.py
+#%{_libdir}/*.a
+#%{_libdir}/*.la
 %{_libdir}/*.so
 
 %files common
@@ -226,24 +206,29 @@ rm -rf %{buildroot}
 # %doc installed_docs/*
 %docdir %{_docdir}/glusterfs
 %doc %{_docdir}/glusterfs/*
-%{_sysconfdir}/glusterfs/glusterfs*
-%{_bindir}/glusterfs-volgen
+%{_sysconfdir}/glusterfs/gluster*
+#%{_bindir}/glusterfs-volgen
 %{_mandir}/man8/glusterfs.8*
-%dir /var/log/glusterfs
+%{_mandir}/man8/gluster.8*
+%{_mandir}/man8/glusterd.8*
+%{_mandir}/man8/glusterfsd.8*
+%dir /var/log/glusterfs/
 %{_sbindir}/glusterfs
+%{_sbindir}/gluster
 %{_sbindir}/glusterfsd
+%{_sbindir}/glusterd
 
 %files client
 %defattr(-,root,root)
-%config(noreplace) %attr(0644,root,root) %{_sysconfdir}/logrotate.d/glusterfs
+%config(noreplace) %attr(0644,root,root) %{_sysconfdir}/logrotate.d/glusterfs-client
 /sbin/mount.glusterfs
 %{_mandir}/man8/mount.glusterfs.8.*
 %attr(0644,root,root) %ghost %config(noreplace) /var/log/glusterfs/glusterfs.log
 
 %files server
 %defattr(-,root,root)
-%attr(0755,root,root) %{_initrddir}/glusterfsd
+%attr(0755,root,root) %{_initrddir}/glusterd
 %config(noreplace) %attr(0644,root,root) %{_sysconfdir}/sysconfig/glusterfsd
-%config(noreplace) %attr(0644,root,root) %{_sysconfdir}/logrotate.d/glusterfsd
+%config(noreplace) %attr(0644,root,root) %{_sysconfdir}/logrotate.d/glusterfs-server
 %attr(0644,root,root) %ghost %config(noreplace) /var/log/glusterfs/glusterfsd.log
 %dir /var/run/glusterfsd
