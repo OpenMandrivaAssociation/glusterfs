@@ -1,0 +1,5 @@
+glusterfs-3.2.6.tar.gz
+glusterfsd.init
+glusterfsd.logrotate
+glusterfsd.sysconfig
+glusterfs.logrotate
