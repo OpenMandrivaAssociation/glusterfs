@@ -232,3 +232,90 @@ fi
 %config(noreplace) %attr(0644,root,root) %{_sysconfdir}/logrotate.d/glusterfs-server
 %attr(0644,root,root) %ghost %config(noreplace) /var/log/glusterfs/glusterfsd.log
 %dir /var/run/glusterfsd
+
+
+%changelog
+* Mon Apr 16 2012 Dmitry Mikhirev <dmikhirev@mandriva.org> 3.2.6-1
++ Revision: 791326
+- manually remove .la files for backporting
+
+* Mon Apr 16 2012 Dmitry Mikhirev <dmikhirev@mandriva.org> 3.2.6-1
++ Revision: 791281
+- update to 3.2.6
+
+* Mon Dec 06 2010 Funda Wang <fwang@mandriva.org> 3.0.0-2mdv2011.0
++ Revision: 611833
+- update file list
+
+  + Oden Eriksson <oeriksson@mandriva.com>
+    - rebuild
+
+* Sat Jan 30 2010 Funda Wang <fwang@mandriva.org> 3.0.0-1mdv2010.1
++ Revision: 498597
+- db storage not there any more
+- New version 3.0.0
+
+* Sun Sep 20 2009 Michael Scherer <misc@mandriva.org> 2.0.6-1mdv2010.0
++ Revision: 444885
+- try to compile without -j, as this may help for weird errors
+
+  + Funda Wang <fwang@mandriva.org>
+    - use configure2_5x
+
+  + Glen Ogilvie <nelg@mandriva.org>
+    - This is a large upgrade, from 1.3.12 to 2.0.6. This includes updated configuration samples and init script.
+      New features:
+      * Distribute (DHT) translator
+      * Replicate atomic write support
+      * High Availability (HA) translator
+      * Non-blocking I/O
+      * Binary Protocol
+      * NUFA translator
+      * APIs via 'libglusterfsclient' library
+      * Apache/Lighttpd embeddable 'mod_glusterfs'
+      * Booster
+      * Multiple OS support
+        * OS X - Server and Client works.
+        * Solaris 10 and above - Server part works file, Client part will be ported in future when FUSE is provided by Solaris.
+        * FreeBSD 7.0 and above - Server and Client works.
+      * Log message improvements
+      * Stripe over tmpfs
+      * Filter translator
+      * Quota translator
+      Full list of upgrade features at:
+      http://www.gluster.com/community/documentation/index.php/Whats_New_v2.0
+
+* Fri Sep 04 2009 Thierry Vignaud <tv@mandriva.org> 1.3.12-4mdv2010.0
++ Revision: 429217
+- rebuild
+
+* Tue Sep 16 2008 Oden Eriksson <oeriksson@mandriva.com> 1.3.12-3mdv2009.0
++ Revision: 285247
+- fix deps
+- rework the initscript and config
+
+* Tue Sep 16 2008 Oden Eriksson <oeriksson@mandriva.com> 1.3.12-2mdv2009.0
++ Revision: 285163
+- fix typo
+- added fixes requested by Jos?\195?\169 Antonio Becerra Permuy
+
+* Fri Sep 12 2008 Oden Eriksson <oeriksson@mandriva.com> 1.3.12-1mdv2009.0
++ Revision: 284140
+- 1.3.12
+
+  + Thierry Vignaud <tv@mandriva.org>
+    - rebuild
+    - kill re-definition of %%buildroot on Pixel's request
+
+  + Olivier Blin <blino@mandriva.org>
+    - restore BuildRoot
+
+* Mon Apr 23 2007 Nicolas Vigier <nvigier@mandriva.com> 1.2.3-1mdv2008.0
++ Revision: 17508
+- Import glusterfs
+
+
+
+
+* Mon Apr 23 2007 Nicolas Vigier <nvigier@mandriva.com>
+- first version

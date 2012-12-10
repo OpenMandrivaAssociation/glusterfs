@@ -1,0 +1,6 @@
+/var/log/glusterfs/glusterfs.log {
+    notifempty
+    missingok
+    monthly
+    compress
+}

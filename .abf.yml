@@ -1,6 +1,2 @@
 sources:
-  "glusterfs-3.2.6.tar.gz:"	b26de87528684fab8939a10087126ffd2a229de7
-  "glusterfsd.init:"	033dc4e6f9de9ab9a26ed09604d43557f6a253c2
-  "glusterfsd.logrotate:"	e3b0e43eec3801b7d8d0ded75a71228be610ae3e
-  "glusterfsd.sysconfig:"	2ec87e674f3549414a0c837efbc14c794472c6b2
-  "glusterfs.logrotate:"	8cb425b933a90dcdfe6c02de0c02555d2ca09e5f
+  "glusterfs-3.2.6.tar.gz": b26de87528684fab8939a10087126ffd2a229de7

@@ -1,0 +1,10 @@
+
+GLUSTERFSD_CONFIG_FILE="/etc/glusterfs/glusterfsd.vol"
+
+GLUSTERFSD_LOGFILE="/var/log/glusterfs/glusterfsd.log"
+
+GLUSTERFSD_LOGLEVEL="WARNING"
+
+GLUSTERFSD_PIDFILE="/var/run/glusterfsd/glusterfsd.pid"
+
+#GLUSTERFSD_OPTIONS=""
