@@ -19,6 +19,7 @@ BuildRequires:	flex
 BuildRequires:	libtool
 BuildRequires:	pkgconfig(fuse)
 BuildRequires:	libibverbs-devel
+BuildRequires:	pkgconfig(libtirpc)
 
 %description
 GlusterFS is a clustered file-system capable of scaling to several
