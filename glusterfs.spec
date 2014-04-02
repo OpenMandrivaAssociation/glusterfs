@@ -1,6 +1,7 @@
 %define major 0
 %define libname %mklibname glusterfs %{major}
 %define devname %mklibname -d glusterfs
+%define _disable_ld_no_undefined 1
 
 Summary:	GlusterFS network/cluster filesystem
 Name:		glusterfs
