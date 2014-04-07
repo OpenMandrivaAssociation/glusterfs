@@ -200,12 +200,13 @@ cp %{SOURCE4} glusterfs.logrotate
 %build
 %configure2_5x \
 	--disable-static \
-	--enable-shared
+	--enable-shared \
+    LIBS=-ltirpc
 
 # Remove rpath
 sed -i 's|^hardcode_libdir_flag_spec=.*|hardcode_libdir_flag_spec=""|g' libtool
 sed -i 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' libtool
-%make LIBS=-ltirpc
+%make 
 
 %install
 make install DESTDIR=%{buildroot}
