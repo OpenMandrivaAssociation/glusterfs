@@ -228,7 +228,7 @@ cp %{SOURCE4} glusterfs.logrotate
 # Remove rpath
 sed -i 's|^hardcode_libdir_flag_spec=.*|hardcode_libdir_flag_spec=""|g' libtool
 sed -i 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' libtool
-make
+%make 
 
 %install
 make install DESTDIR=%{buildroot}
