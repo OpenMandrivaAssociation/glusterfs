@@ -1,15 +1,16 @@
 %define major 0
 %define libname %mklibname glusterfs %{major}
 %define devname %mklibname -d glusterfs
+%define _disable_ld_no_undefined 1
 
 Summary:	GlusterFS network/cluster filesystem
 Name:		glusterfs
-Version:	3.2.6
-Release:	2
+Version:	3.4.3
+Release:	1
 License:	GPLv3+
 Group:		Networking/Other
 URL:		http://www.gluster.org/docs/index.php/GlusterFS
-Source0:	ftp://ftp.gluster.com/pub/gluster/glusterfs/3.0/%{version}/%{name}-%{version}.tar.gz
+Source0:	http://download.gluster.org/pub/gluster/glusterfs/3.4/%{version}/%{name}-%{version}.tar.gz
 Source1:	glusterfsd.init
 Source2:	glusterfsd.sysconfig
 Source3:	glusterfsd.logrotate
@@ -82,6 +83,7 @@ This package contains the static GlusterFS library and its header files.
 %files -n %{devname}
 %{_includedir}/glusterfs/
 %{_libdir}/*.so
+%{_libdir}/pkgconfig/*.pc
 
 #----------------------------------------------------------------------------
 
@@ -142,6 +144,7 @@ This package is the client needed to mount a GlusterFS fs.
 /sbin/mount.glusterfs
 %{_mandir}/man8/mount.glusterfs.8.*
 %attr(0644,root,root) %ghost %config(noreplace) /var/log/glusterfs/glusterfs.log
+%{_bindir}/fusermount-glusterfs
 
 %post client
 %create_ghostfile /var/log/glusterfs/glusterfs.log root root 0644
@@ -174,6 +177,7 @@ This package is the server.
 %config(noreplace) %attr(0644,root,root) %{_sysconfdir}/logrotate.d/glusterfs-server
 %attr(0644,root,root) %ghost %config(noreplace) /var/log/glusterfs/glusterfsd.log
 %dir /var/run/glusterfsd
+%{_prefix}/lib/ocf/resource.d/glusterfs
 
 %post server
 %create_ghostfile /var/log/glusterfs/glusterfsd.log root root 0644
@@ -188,6 +192,26 @@ fi
 %_preun_service glusterfsd
 
 #----------------------------------------------------------------------------
+%package geo-replication
+Summary:	GlusterFS Geo-replication
+Group:		Networking/Other
+Requires:	%{name}-common = %{version}
+Requires:	%{name}-client = %{version}
+
+%description geo-replication
+GlusterFS is a clustered file-system capable of scaling to several
+peta-bytes. It aggregates various storage bricks over Infiniband RDMA
+or TCP/IP interconnect into one large parallel network file
+system. GlusterFS is one of the most sophisticated file system in
+terms of features and extensibility.  It borrows a powerful concept
+called Translators from GNU Hurd kernel. Much of the code in GlusterFS
+is in userspace and easily manageable.
+
+This package provides support to geo-replication.
+
+%files geo-replication
+%{_libexecdir}/glusterfs/gsyncd
+%{_libexecdir}/glusterfs/python/syncdaemon/*
 
 %prep
 %setup -q
@@ -199,7 +223,7 @@ cp %{SOURCE4} glusterfs.logrotate
 %build
 %configure2_5x \
 	--disable-static \
-	--enable-shared
+	--enable-shared LIBS=-ltirpc
 
 # Remove rpath
 sed -i 's|^hardcode_libdir_flag_spec=.*|hardcode_libdir_flag_spec=""|g' libtool
