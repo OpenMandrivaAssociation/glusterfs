@@ -6,7 +6,7 @@
 Summary:	GlusterFS network/cluster filesystem
 Name:		glusterfs
 Version:	3.4.3
-Release:	2
+Release:	3
 License:	GPLv3+
 Group:		Networking/Other
 URL:		http://www.gluster.org/docs/index.php/GlusterFS
