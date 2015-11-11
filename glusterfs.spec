@@ -6,7 +6,7 @@
 Summary:	GlusterFS network/cluster filesystem
 Name:		glusterfs
 Version:	3.7.6
-Release:	1
+Release:	0.1
 License:	GPLv3+
 Group:		Networking/Other
 URL:		http://www.gluster.org/docs/index.php/GlusterFS
@@ -21,7 +21,7 @@ BuildRequires:	libtool
 BuildRequires:	pkgconfig(fuse)
 BuildRequires:	libibverbs-devel
 BuildRequires:	pkgconfig(libtirpc)
-BuildRequires:	python2
+BuildRequires:	pkgconfig(python2)
 
 %description
 GlusterFS is a clustered file-system capable of scaling to several
@@ -251,6 +251,7 @@ This package provides support to geo-replication.
 %{_libexecdir}/glusterfs/gsyncd
 %{_libexecdir}/glusterfs/python/syncdaemon/*
 %{_libexecdir}/glusterfs/set_geo_rep_pem_keys.sh
+%py_puresitedir/gluster
 
 %prep
 %setup -q
