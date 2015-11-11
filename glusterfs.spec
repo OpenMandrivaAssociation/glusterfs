@@ -5,12 +5,12 @@
 
 Summary:	GlusterFS network/cluster filesystem
 Name:		glusterfs
-Version:	3.4.3
-Release:	3
+Version:	3.7.6
+Release:	1
 License:	GPLv3+
 Group:		Networking/Other
 URL:		http://www.gluster.org/docs/index.php/GlusterFS
-Source0:	http://download.gluster.org/pub/gluster/glusterfs/3.4/%{version}/%{name}-%{version}.tar.gz
+Source0:	http://download.gluster.org/pub/gluster/glusterfs/%(echo %{version} |cut -d. -f1-2)/%{version}/%{name}-%{version}.tar.gz
 Source1:	glusterfsd.init
 Source2:	glusterfsd.sysconfig
 Source3:	glusterfsd.logrotate
@@ -21,6 +21,7 @@ BuildRequires:	libtool
 BuildRequires:	pkgconfig(fuse)
 BuildRequires:	libibverbs-devel
 BuildRequires:	pkgconfig(libtirpc)
+BuildRequires:	python2
 
 %description
 GlusterFS is a clustered file-system capable of scaling to several
@@ -120,6 +121,38 @@ These are needed by both glusterfs client and server.
 %{_sbindir}/glusterfsd
 %{_sbindir}/glusterd
 
+# Ganesha stuff... Is this needed for both client and server?
+%dir %{_sysconfdir}/ganesha
+%{_sysconfdir}/ganesha/ganesha-ha.conf.sample
+%{_libexecdir}/ganesha
+%dir %{_prefix}/lib/ocf
+%dir %{_prefix}/lib/ocf/resource.d
+%dir %{_prefix}/lib/ocf/resource.d/heartbeat
+%{_prefix}/lib/ocf/resource.d/heartbeat/ganesha_grace
+%{_prefix}/lib/ocf/resource.d/heartbeat/ganesha_mon
+%{_prefix}/lib/ocf/resource.d/heartbeat/ganesha_nfsd
+
+
+%dir %{_sysconfdir}/glusterfs
+%{_sysconfdir}/glusterfs/group-virt.example
+%{_sysconfdir}/glusterfs/logger.conf.example
+%{_bindir}/glusterfind
+%dir %{_libexecdir}/glusterfs
+%{_libexecdir}/glusterfs/gverify.sh
+%{_libexecdir}/glusterfs/peer_add_secret_pub
+%{_libexecdir}/glusterfs/peer_gsec_create
+%{_libexecdir}/glusterfs/peer_mountbroker
+%{_libexecdir}/glusterfs/gfind_missing_files
+%{_libexecdir}/glusterfs/glusterfind
+
+%{_sbindir}/gcron.py
+%{_sbindir}/gfind_missing_files
+%{_sbindir}/glfsheal
+%{_sbindir}/snap_scheduler.py
+%dir %{_datadir}/glusterfs
+%dir %{_datadir}/glusterfs/scripts
+%{_datadir}/glusterfs/scripts/*
+
 #----------------------------------------------------------------------------
 
 %package	client
@@ -178,6 +211,11 @@ This package is the server.
 %attr(0644,root,root) %ghost %config(noreplace) /var/log/glusterfs/glusterfsd.log
 %dir /var/run/glusterfsd
 %{_prefix}/lib/ocf/resource.d/glusterfs
+%dir %{_localstatedir}/lib/glusterd
+%dir %{_localstatedir}/lib/glusterd/groups
+%{_localstatedir}/lib/glusterd/groups/virt
+%dir %{_localstatedir}/lib/glusterd/hooks
+%{_localstatedir}/lib/glusterd/hooks/1
 
 %post server
 %create_ghostfile /var/log/glusterfs/glusterfsd.log root root 0644
@@ -212,6 +250,7 @@ This package provides support to geo-replication.
 %files geo-replication
 %{_libexecdir}/glusterfs/gsyncd
 %{_libexecdir}/glusterfs/python/syncdaemon/*
+%{_libexecdir}/glusterfs/set_geo_rep_pem_keys.sh
 
 %prep
 %setup -q
@@ -221,9 +260,10 @@ cp %{SOURCE3} glusterfsd.logrotate
 cp %{SOURCE4} glusterfs.logrotate
 
 %build
+export PYTHON=python2
 %configure2_5x \
 	--disable-static \
-	--enable-shared LIBS=-ltirpc
+	--enable-shared LIBS=-ltirpc CC=gcc CFLAGS="%{optflags} -fno-lto -fuse-ld=bfd" LDFLAGS="%{optflags} -fno-lto -fuse-ld=bfd"
 
 # Remove rpath
 sed -i 's|^hardcode_libdir_flag_spec=.*|hardcode_libdir_flag_spec=""|g' libtool
@@ -251,4 +291,3 @@ touch %{buildroot}/var/log/glusterfs/glusterfsd.log
 
 # remove default startup script
 rm %{buildroot}/etc/init.d/glusterd
-

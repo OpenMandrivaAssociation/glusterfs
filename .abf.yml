@@ -1,4 +1,2 @@
-removed_sources:
-  glusterfs-3.2.6.tar.gz: b26de87528684fab8939a10087126ffd2a229de7
 sources:
-  glusterfs-3.4.3.tar.gz: e998a0c12bf06c13758cec34da5e7ddae387a0de
+  glusterfs-3.7.6.tar.gz: e611726b87f55e91041d4e8e6aa8c50e861f0957
