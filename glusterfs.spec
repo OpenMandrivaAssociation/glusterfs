@@ -21,6 +21,7 @@ BuildRequires:	libtool
 BuildRequires:	pkgconfig(fuse)
 BuildRequires:	libibverbs-devel
 BuildRequires:	pkgconfig(libtirpc)
+BuildRequires:	lib64acl-devel
 BuildRequires:	pkgconfig(python2)
 
 %description
