@@ -21,7 +21,7 @@ BuildRequires:	libtool
 BuildRequires:	pkgconfig(fuse)
 BuildRequires:	libibverbs-devel
 BuildRequires:	pkgconfig(libtirpc)
-BuildRequires:	lib64acl-devel
+BuildRequires:	libacl-devel
 BuildRequires:	python2
 
 %description
@@ -262,7 +262,7 @@ cp %{SOURCE4} glusterfs.logrotate
 
 %build
 export PYTHON=python2
-%configure2_5x \
+%configure \
 	--disable-static \
 	--enable-shared LIBS=-ltirpc CC=gcc CFLAGS="%{optflags} -fno-lto -fuse-ld=bfd" LDFLAGS="%{optflags} -fno-lto -fuse-ld=bfd"
 
