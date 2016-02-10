@@ -5,23 +5,26 @@
 
 Summary:	GlusterFS network/cluster filesystem
 Name:		glusterfs
-Version:	3.7.6
+Version:	3.7.8
 Release:	1
 License:	GPLv3+
 Group:		Networking/Other
 URL:		http://www.gluster.org/docs/index.php/GlusterFS
 Source0:	http://download.gluster.org/pub/gluster/glusterfs/%(echo %{version} |cut -d. -f1-2)/%{version}/%{name}-%{version}.tar.gz
-Source1:	glusterfsd.init
+Source1:	glusterfsd.service
 Source2:	glusterfsd.sysconfig
 Source3:	glusterfsd.logrotate
 Source4:	glusterfs.logrotate
+Source5:	glusterd.sysconfig
+
 BuildRequires:	bison
 BuildRequires:	flex
 BuildRequires:	libtool
 BuildRequires:	pkgconfig(fuse)
+BuildRequires:	pkgconfig(liburcu-bp)
 BuildRequires:	libibverbs-devel
 BuildRequires:	pkgconfig(libtirpc)
-BuildRequires:	libacl-devel
+BuildRequires:	acl-devel
 BuildRequires:	python2
 
 %description
@@ -255,10 +258,11 @@ This package provides support to geo-replication.
 
 %prep
 %setup -q
-cp %{SOURCE1} glusterfsd.init
+cp %{SOURCE1} glusterfsd.service
 cp %{SOURCE2} glusterfsd.sysconfig
 cp %{SOURCE3} glusterfsd.logrotate
 cp %{SOURCE4} glusterfs.logrotate
+cp %{SOURCE4} glusterd.sysconfig
 
 %build
 export PYTHON=python2
@@ -277,12 +281,12 @@ mkdir -p %{buildroot}%{_includedir}/glusterfs
 mkdir -p %{buildroot}/var/log/glusterfs
 install -p -m 0644 libglusterfs/src/*.h %{buildroot}%{_includedir}/glusterfs/
 
-install -d %{buildroot}%{_initrddir}
+install -d %{buildroot}%{_unitdir}/
 install -d %{buildroot}%{_sysconfdir}/sysconfig
 install -d %{buildroot}%{_sysconfdir}/logrotate.d
 install -d %{buildroot}/var/run/glusterfsd
 
-install -m0755 glusterfsd.init %{buildroot}%{_initrddir}/glusterd
+install -m0755 glusterfsd.service %{buildroot}%{_initrddir}/glusterd
 install -m0644 glusterfsd.sysconfig %{buildroot}%{_sysconfdir}/sysconfig/glusterfsd
 install -m0644 glusterfsd.logrotate %{buildroot}%{_sysconfdir}/logrotate.d/glusterfs-server
 install -m0644 glusterfs.logrotate %{buildroot}%{_sysconfdir}/logrotate.d/glusterfs-client
