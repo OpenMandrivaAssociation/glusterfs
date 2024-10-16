@@ -9,7 +9,7 @@ Version:	3.7.8
 Release:	2
 License:	GPLv3+
 Group:		Networking/Other
-URL:		http://www.gluster.org/docs/index.php/GlusterFS
+URL:		https://www.gluster.org/docs/index.php/GlusterFS
 Source0:	http://download.gluster.org/pub/gluster/glusterfs/%(echo %{version} |cut -d. -f1-2)/%{version}/%{name}-%{version}.tar.gz
 Source1:	glusterfsd.service
 Source2:	glusterfsd.sysconfig
