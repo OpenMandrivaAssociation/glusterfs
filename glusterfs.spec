@@ -17,6 +17,11 @@ Source3:	glusterfsd.logrotate
 Source4:	glusterfs.logrotate
 Source5:	glusterd.sysconfig
 
+BuildRequires:	autoconf
+BuildRequires:	automake
+BuildRequires:	libtool-base
+BuildRequires:	slibtool
+BuildRequires:	make
 BuildRequires:	bison
 BuildRequires:	flex
 BuildRequires:	libtool
